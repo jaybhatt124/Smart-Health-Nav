@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediFind — Find Specialist Hospitals Near You</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏥</text></svg>">
+    <style>
+        :root {
+            --bg: #080d1a;
+            --bg2: #0d1526;
+            --surface: #111827;
+            --surface2: #1a2235;
+            --border: rgba(255,255,255,0.07);
+            --border2: rgba(255,255,255,0.12);
+            --accent: #3b82f6;
+            --accent2: #06b6d4;
+            --gold: #f59e0b;
+            --green: #10b981;
+            --red: #ef4444;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --dim: #475569;
+            --font-head: 'Syne', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ── NOISE TEXTURE ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── GLOW ORBS ── */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .orb1 { width: 500px; height: 500px; background: rgba(59,130,246,0.08); top: -200px; right: -100px; }
+        .orb2 { width: 400px; height: 400px; background: rgba(6,182,212,0.06); bottom: 100px; left: -100px; }
+
+        /* ── HEADER ── */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(8,13,26,0.8);
+            backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .logo-mark {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 0 20px rgba(59,130,246,0.3);
+        }
+        .logo-name {
+            font-family: var(--font-head);
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.5px;
+        }
+        .logo-name span { color: var(--accent2); }
+        .logo-tag { font-size: 0.65rem; color: var(--dim); letter-spacing: 1px; text-transform: uppercase; display: block; }
+
+        nav { display: flex; gap: 0.25rem; align-items: center; }
+        nav a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            padding: 7px 16px;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+        nav a:hover, nav a.active { color: var(--text); background: var(--surface2); }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+        }
+        .menu-toggle span {
+            display: block;
+            width: 22px; height: 2px;
+            background: var(--muted);
+            border-radius: 2px;
+            transition: all 0.2s;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            position: relative;
+            z-index: 1;
+            padding: 5rem 2rem 3rem;
+        }
+        .hero-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(59,130,246,0.1);
+            border: 1px solid rgba(59,130,246,0.2);
+            color: #93c5fd;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 5px 14px;
+            border-radius: 100px;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.3px;
+        }
+        .pill-dot { width: 6px; height: 6px; background: var(--accent2); border-radius: 50%; animation: blink 2s infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+        .hero-title {
+            font-family: var(--font-head);
+            font-size: clamp(2.2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            letter-spacing: -2px;
+            line-height: 1.05;
+            margin-bottom: 1.25rem;
+        }
+        .hero-title .line2 { color: var(--accent2); }
+
+        .hero-desc {
+            color: var(--muted);
+            font-size: 1.05rem;
+            max-width: 480px;
+            line-height: 1.7;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 2rem;
+        }
+        .stat { }
+        .stat-num {
+            font-family: var(--font-head);
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -1px;
+        }
+        .stat-label { font-size: 0.8rem; color: var(--dim); margin-top: 2px; }
+
+        .location-panel {
+            margin-top: 2rem;
+            background: rgba(17,24,39,0.9);
+            border: 1px solid var(--border2);
+            border-radius: 20px;
+            padding: 1.25rem;
+            max-width: 520px;
+        }
+        .location-panel h3 {
+            font-family: var(--font-head);
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+        .location-panel p {
+            color: var(--muted);
+            font-size: 0.86rem;
+            margin-bottom: 1rem;
+        }
+        .location-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.75rem;
+        }
+        .location-btn {
+            border: none;
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        .location-btn:hover { transform: translateY(-1px); opacity: 0.92; }
+        .location-btn.primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+        }
+        .location-btn.secondary {
+            background: var(--surface2);
+            color: var(--text);
+            border: 1px solid var(--border2);
+        }
+        .location-input-row {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .location-input {
+            flex: 1 1 260px;
+            min-width: 0;
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: 12px;
+            color: var(--text);
+            padding: 0.85rem 1rem;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .location-status {
+            margin-top: 0.75rem;
+            color: var(--dim);
+            font-size: 0.78rem;
+        }
+
+        /* ── BODY MAP CARD ── */
+        .body-card {
+            background: var(--surface);
+            border: 1px solid var(--border2);
+            border-radius: 28px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .body-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 50% 0%, rgba(59,130,246,0.06), transparent 60%);
+            pointer-events: none;
+        }
+
+        .body-card-label {
+            font-family: var(--font-head);
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--dim);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .hover-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: 100px;
+            padding: 6px 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--muted);
+            margin-bottom: 1.25rem;
+            transition: all 0.2s;
+            min-width: 180px;
+            justify-content: center;
+        }
+
+        .body-map {
+            width: 100%;
+            max-width: 200px;
+            cursor: pointer;
+        }
+
+        .body-part {
+            fill: transparent;
+            stroke: rgba(59,130,246,0.15);
+            stroke-width: 1;
+            cursor: pointer;
+            transition: fill 0.15s, stroke 0.15s;
+        }
+        .body-part:hover {
+            fill: rgba(59,130,246,0.35);
+            stroke: rgba(96,165,250,0.8);
+        }
+
+        .body-hint {
+            margin-top: 1rem;
+            font-size: 0.75rem;
+            color: var(--dim);
+        }
+
+        /* ── LOCATION OVERLAY ── */
+        #locationOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(8,13,26,0.75);
+            backdrop-filter: blur(6px);
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .loc-spinner {
+            width: 52px; height: 52px;
+            border: 3px solid rgba(59,130,246,0.2);
+            border-top-color: var(--accent2);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loc-text { color: var(--text); font-weight: 600; font-size: 1rem; }
+        .loc-sub { color: var(--muted); font-size: 0.8rem; }
+
+        /* ── SECTION ── */
+        section {
+            position: relative;
+            z-index: 1;
+            padding: 4rem 2rem;
+        }
+        .section-inner { max-width: 1200px; margin: 0 auto; }
+
+        .section-tag {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent2);
+            margin-bottom: 0.75rem;
+        }
+        .section-title {
+            font-family: var(--font-head);
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 2rem;
+        }
+
+        /* ── HOW IT WORKS ── */
+        .how-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        .how-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+        }
+        .how-num {
+            position: absolute;
+            top: 1.5rem; right: 1.5rem;
+            font-family: var(--font-head);
+            font-size: 3rem;
+            font-weight: 800;
+            color: rgba(255,255,255,0.04);
+            line-height: 1;
+        }
+        .how-icon { font-size: 2rem; margin-bottom: 1rem; }
+        .how-title {
+            font-family: var(--font-head);
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .how-desc { font-size: 0.875rem; color: var(--muted); line-height: 1.6; }
+
+        /* ── ILLNESS GRID ── */
+        .illness-section { background: var(--bg2); }
+
+        .illness-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .illness-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.25rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .illness-card:hover {
+            background: var(--surface2);
+            border-color: var(--border2);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+        }
+        .illness-card:active { transform: scale(0.97); }
+        .illness-icon { font-size: 2rem; margin-bottom: 0.5rem; display: block; }
+        .illness-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--muted);
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            position: relative;
+            z-index: 1;
+            border-top: 1px solid var(--border);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            color: var(--dim);
+            font-size: 0.8rem;
+        }
+        footer a { color: var(--accent2); text-decoration: none; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            .hero-inner { grid-template-columns: 1fr; gap: 3rem; }
+            .body-card { max-width: 320px; margin: 0 auto; }
+            .how-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            .hero { padding: 3rem 1.25rem 2rem; }
+            section { padding: 3rem 1.25rem; }
+            .header-inner { padding: 0 1.25rem; }
+            .illness-grid { grid-template-columns: repeat(3, 1fr); }
+            .menu-toggle { display: flex; }
+            nav { display: none; position: absolute; top: 68px; left: 0; right: 0;
+                  background: var(--surface); border-bottom: 1px solid var(--border);
+                  flex-direction: column; padding: 0.5rem; }
+            nav.active { display: flex; }
+            .hero-stats { gap: 1.5rem; }
+            .location-input-row { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- GLOW ORBS -->
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<!-- LOCATION GETTING OVERLAY -->
+<div id="locationOverlay">
+    <div class="loc-spinner"></div>
+    <div class="loc-text">📍 Getting your exact location...</div>
+    <div class="loc-sub">Please allow location access in your browser</div>
+</div>
+
+<!-- HEADER -->
+<header>
+    <div class="header-inner">
+        <a href="/" class="logo">
+            <div class="logo-mark">🏥</div>
+            <div>
+                <div class="logo-name">Medi<span>Find</span></div>
+                <div class="logo-tag">Smart Healthcare Navigation</div>
+            </div>
+        </a>
+        <nav id="mainNav">
+            <a href="/" class="active">Home</a>
+            <a href="/about">About</a>
+            <a href="/tips">Health Tips</a>
+            <a href="/contact">Contact</a>
+        </nav>
+        <button class="menu-toggle" onclick="toggleMenu()" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-inner">
+        <!-- LEFT -->
+        <div>
+            <div class="pill">
+                <span class="pill-dot"></span>
+                GPS-Powered · Ahmedabad & Beyond
+            </div>
+            <h1 class="hero-title">
+                Find the Right<br>
+                <span class="line2">Specialist Hospital</span>
+            </h1>
+            <p class="hero-desc">
+                Click where it hurts on the body map. Use your current GPS or type a location, and the app will show specialist hospitals near you grouped by medical department.
+            </p>
+            <div class="hero-stats">
+                <div class="stat">
+                    <div class="stat-num">10+</div>
+                    <div class="stat-label">Body Parts</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">12</div>
+                    <div class="stat-label">Illnesses</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">GPS</div>
+                    <div class="stat-label">Precision</div>
+                </div>
+            </div>
+
+            <div class="location-panel">
+                <h3>Choose Your Location</h3>
+                <p>Use your live GPS or type a city, area, or pincode before searching.</p>
+                <div class="location-actions">
+                    <button type="button" class="location-btn primary" id="detectLocationBtn">Use Current Location</button>
+                    <button type="button" class="location-btn secondary" id="openManualLocationBtn">Enter Location Manually</button>
+                </div>
+                <div class="location-input-row">
+                    <input
+                        id="manualLocationInput"
+                        class="location-input"
+                        type="text"
+                        placeholder="Ahmedabad, Bopal, Navrangpura, 380009..."
+                        autocomplete="off"
+                    >
+                    <button type="button" class="location-btn secondary" id="searchManualLocationBtn">Save Location</button>
+                </div>
+                <div class="location-status" id="selectedLocationStatus">No location selected yet.</div>
+            </div>
+        </div>
+
+        <!-- RIGHT — BODY MAP -->
+        <div class="body-card">
+            <div class="body-card-label">Body Map</div>
+            <div class="hover-chip" id="hoverLabel">👆 Click any body part</div>
+
+            <svg class="body-map" viewBox="0 0 220 580" xmlns="http://www.w3.org/2000/svg">
+                <!-- Decorative outline -->
+                <g fill="rgba(59,130,246,0.04)" stroke="rgba(59,130,246,0.12)" stroke-width="1.2">
+                    <ellipse cx="110" cy="52" rx="32" ry="38"/>
+                    <rect x="98" y="87" width="24" height="22" rx="4"/>
+                    <path d="M68 109 Q62 109 56 120 L44 200 Q42 220 50 230 L60 290 L160 290 L170 230 Q178 220 176 200 L164 120 Q158 109 152 109 Z"/>
+                    <ellipse cx="52" cy="128" rx="18" ry="14"/>
+                    <ellipse cx="168" cy="128" rx="18" ry="14"/>
+                    <path d="M36 139 Q28 146 26 171 L28 210 Q30 220 38 222 L46 222 Q52 220 54 210 L56 180 Q56 156 48 139 Z"/>
+                    <path d="M184 139 Q192 146 194 171 L192 210 Q190 220 182 222 L174 222 Q168 220 166 210 L164 180 Q164 156 172 139 Z"/>
+                    <path d="M29 224 Q24 241 24 268 L26 295 Q28 305 34 307 L42 307 Q48 305 50 295 L50 268 Q50 243 48 224 Z"/>
+                    <path d="M172 224 Q172 243 170 268 L170 295 Q172 305 178 307 L186 307 Q192 305 194 295 L196 268 Q196 241 191 224 Z"/>
+                    <ellipse cx="36" cy="316" rx="11" ry="14"/>
+                    <ellipse cx="184" cy="316" rx="11" ry="14"/>
+                    <path d="M60 290 Q55 310 62 325 L90 335 L130 335 L158 325 Q165 310 160 290 Z"/>
+                    <path d="M65 333 Q55 346 54 381 L54 416 Q56 430 66 434 L80 434 Q90 430 92 416 L90 381 Q88 349 82 333 Z"/>
+                    <path d="M155 333 Q165 346 166 381 L166 416 Q164 430 154 434 L140 434 Q130 430 128 416 L130 381 Q132 349 138 333 Z"/>
+                    <ellipse cx="73" cy="443" rx="16" ry="14"/>
+                    <ellipse cx="147" cy="443" rx="16" ry="14"/>
+                    <path d="M59 457 Q56 476 57 505 L58 530 Q60 540 67 542 L78 542 Q85 540 87 530 L88 505 Q89 476 88 457 Z"/>
+                    <path d="M132 457 Q131 476 132 505 L133 530 Q135 540 142 542 L153 542 Q160 540 162 530 L163 505 Q164 476 161 457 Z"/>
+                    <path d="M57 543 Q55 556 58 564 L92 566 Q98 564 97 556 L95 543 Z"/>
+                    <path d="M133 543 Q131 556 133 564 L167 566 Q173 564 172 556 L170 543 Z"/>
+                </g>
+
+                <!-- Clickable parts -->
+                <ellipse class="body-part" data-part="head" data-name="Head" cx="110" cy="52" rx="34" ry="40"/>
+                <rect class="body-part" data-part="neck" data-name="Neck" x="93" y="86" width="34" height="26" rx="5"/>
+                <ellipse class="body-part" data-part="shoulders" data-name="Shoulders" cx="52" cy="125" rx="23" ry="18"/>
+                <ellipse class="body-part" data-part="shoulders" data-name="Shoulders" cx="168" cy="125" rx="23" ry="18"/>
+                <path class="body-part" data-part="chest" data-name="Chest" d="M74 109 L146 109 L158 168 L62 168 Z"/>
+                <path class="body-part" data-part="stomach" data-name="Stomach" d="M62 170 L158 170 L162 260 L58 260 Z"/>
+                <path class="body-part" data-part="arms" data-name="Arms" d="M24 135 Q14 162 18 218 L54 218 L56 176 L44 135 Z"/>
+                <path class="body-part" data-part="arms" data-name="Arms" d="M166 135 L176 135 Q206 162 202 218 L166 218 L164 176 Z"/>
+                <path class="body-part" data-part="back" data-name="Back" d="M62 262 L58 292 L162 292 L158 262 Z"/>
+                <ellipse class="body-part" data-part="knees" data-name="Knees" cx="73" cy="443" rx="18" ry="16"/>
+                <ellipse class="body-part" data-part="knees" data-name="Knees" cx="147" cy="443" rx="18" ry="16"/>
+                <path class="body-part" data-part="legs" data-name="Legs" d="M54 333 L92 333 L92 428 L54 428 Z"/>
+                <path class="body-part" data-part="legs" data-name="Legs" d="M128 333 L166 333 L166 428 L128 428 Z"/>
+                <path class="body-part" data-part="legs" data-name="Legs" d="M56 460 L90 460 L90 538 L56 538 Z"/>
+                <path class="body-part" data-part="legs" data-name="Legs" d="M130 460 L164 460 L164 538 L130 538 Z"/>
+                <path class="body-part" data-part="feet" data-name="Feet" d="M53 541 L100 541 L100 568 L53 568 Z"/>
+                <path class="body-part" data-part="feet" data-name="Feet" d="M120 541 L172 541 L172 568 L120 568 Z"/>
+            </svg>
+
+            <div class="body-hint">💡 Tap a body part to find nearby specialist hospitals</div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section>
+    <div class="section-inner">
+        <div class="section-tag">How it works</div>
+        <div class="section-title">3 Steps to Find Your Hospital</div>
+        <div class="how-grid">
+            <div class="how-card">
+                <div class="how-num">01</div>
+                <div class="how-icon">👆</div>
+                <div class="how-title">Click Where It Hurts</div>
+                <div class="how-desc">Tap a body part on the diagram — head, chest, knees, stomach — wherever you feel pain or discomfort.</div>
+            </div>
+            <div class="how-card">
+                <div class="how-num">02</div>
+                <div class="how-icon">📍</div>
+                <div class="how-title">Choose Your Location</div>
+                <div class="how-desc">Use live GPS when it works well, or enter a city, area, or pincode manually if needed.</div>
+            </div>
+            <div class="how-card">
+                <div class="how-num">03</div>
+                <div class="how-icon">🏥</div>
+                <div class="how-title">See Specialist Hospitals</div>
+                <div class="how-desc">Results are grouped by specialty — Orthopedics, Cardiology, Neurology — with multispecialty hospitals first.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- COMMON ILLNESSES -->
+<section class="illness-section">
+    <div class="section-inner">
+        <div class="section-tag">Common Conditions</div>
+        <div class="section-title">Or Search by Illness</div>
+        <div class="illness-grid">
+            {% for illness_id, info in illnesses.items() %}
+            <div class="illness-card" data-illness="{{ illness_id }}" data-name="{{ info.label }}">
+                <span class="illness-icon">{{ info.icon }}</span>
+                <div class="illness-label">{{ info.label }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<footer>
+    © 2024 MediFind · SSIP Project 2024–25 ·
+    Powered by <a href="https://www.geoapify.com/" target="_blank">Geoapify</a> ·
+    <a href="/about">About</a> · <a href="/contact">Contact</a>
+</footer>
+
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+</body>
+</html>

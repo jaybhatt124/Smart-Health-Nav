@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Health Tips{% endblock %}
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <h1>Health Tips & Wellness</h1>
+        <p>Evidence-based tips for better health</p>
+    </div>
+</section>
+<section class="section content-section">
+    <div class="container" id="tipsContainer"></div>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/tips.js') }}"></script>{% endblock %}

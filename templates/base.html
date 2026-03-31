@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI Doctor Analysis{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header class="header">
+    <div class="container">
+        <div class="logo">
+            <div class="logo-icon">🏥</div>
+            <div class="logo-text">
+                <div class="logo-title">AI Doctor <span>Analysis</span></div>
+                <div class="logo-subtitle">Smart Healthcare Navigation</div>
+            </div>
+        </div>
+        <nav class="nav">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/about" class="nav-link">About</a>
+            <a href="/tips" class="nav-link">Health Tips</a>
+            <a href="/contact" class="nav-link">Contact</a>
+        </nav>
+    </div>
+</header>
+
+{% block content %}{% endblock %}
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="logo">
+                    <div class="logo-icon">🏥</div>
+                    <div class="logo-text">
+                        <div class="logo-title">AI Doctor <span>Analysis</span></div>
+                    </div>
+                </div>
+                <p class="footer-text">Making healthcare navigation accessible.</p>
+                <p class="footer-text" style="margin-top: 10px; font-size: 13px;">🇮🇳 Powered by MapmyIndia</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <a href="/">Home</a>
+                <a href="/about">About</a>
+            </div>
+            <div class="footer-section">
+                <h4>Disclaimer</h4>
+                <p>For educational purposes only.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2024 AI Doctor Analysis. SSIP Project.</p>
+        </div>
+    </div>
+</footer>
+{% block scripts %}{% endblock %}
+</body>
+</html>
